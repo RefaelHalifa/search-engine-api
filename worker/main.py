@@ -1,0 +1,1 @@
+print("Worker service started — Kafka consumer not yet implemented (SE-5)")
