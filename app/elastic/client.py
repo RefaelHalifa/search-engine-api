@@ -1,10 +1,11 @@
 # app/elastic/client.py
 from elasticsearch import AsyncElasticsearch
+
 from app.config import settings
 
 es = AsyncElasticsearch(hosts=[f"http://{settings.es_host}:{settings.es_port}"])
 
-INDEX_NAME = "documents"
+INDEX_NAME = settings.es_index_documents
 
 INDEX_MAPPING = {
     "settings": {
@@ -22,7 +23,8 @@ INDEX_MAPPING = {
 }
 
 
-async def create_index():
+async def create_index() -> None:
+    """Create the documents index in Elasticsearch if it doesn't already exist."""
     exists = await es.indices.exists(index=INDEX_NAME)
     if not exists:
         await es.indices.create(index=INDEX_NAME, body=INDEX_MAPPING)

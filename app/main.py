@@ -3,13 +3,14 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
+from app.auth.routes import router as auth_router
 from app.config import settings
 from app.elastic.client import create_index
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print(f"Starting search-engine-api")
+    print("Starting search-engine-api")
     print(f"Elasticsearch: {settings.es_host}:{settings.es_port}")
     print(f"Kafka: {settings.kafka_bootstrap_servers}")
     await create_index()
@@ -24,7 +25,10 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+app.include_router(auth_router)
+
 
 @app.get("/health")
-async def health():
+async def health() -> dict[str, str]:
+    """Return a simple status payload confirming the API is running."""
     return {"status": "ok"}
